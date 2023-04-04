@@ -1,49 +1,58 @@
 //your code here
-let startTime, timerInterval;
-const timerEl = document.getElementById("timer");
-const startBtn = document.getElementById("start");
-const pauseBtn = document.getElementById("pause");
-const stopBtn = document.getElementById("stop");
+//your code here
+let time = 0;
+let timerOn = false;
+let timerDiv = document.getElementById('time')
+document.getElementById('pause').setAttribute('disabled', true)
+document.getElementById('stop').setAttribute('disabled', true)
 
-function startTimer() {
-  startTime = Date.now();
-  timerInterval = setInterval(updateTimer, 100);
-  startBtn.disabled = true;
-  pauseBtn.disabled = false;
-  stopBtn.disabled = false;
+let timerId;
+
+function setTime() {
+    timerDiv.innerText = (parseInt(time / 3600) < 10 ? "0" : "") + parseInt(time / 3600) + ":" + (parseInt((time / 60) % 60) < 10 ? "0" : "") + parseInt((time / 60) % 60) + ":" + (parseInt((time) % 60) < 10 ? "0" : "") + parseInt((time) % 60)
+}
+setTime()
+
+function start() {
+    if (!timerOn) {
+        timerId = setInterval(() => {
+            time = time + 0.1;
+            setTime();
+        }, 100);
+        document.getElementById('start').setAttribute('disabled', true)
+        document.getElementById('stop').removeAttribute('disabled')
+        document.getElementById('pause').removeAttribute('disabled')
+
+
+        timerOn = true;
+    }
 }
 
-function updateTimer() {
-  const elapsedTime = Date.now() - startTime;
-  const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-  const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-  timerEl.innerText = `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+function stop() {
+    document.getElementById('start').removeAttribute('disabled')
+    document.getElementById('pause').setAttribute('disabled', true)
+    document.getElementById('pause').innerText = "pause"
+    document.getElementById('stop').setAttribute('disabled', true)
+    clearInterval(timerId)
+    time = 0;
+    setTime();
+    timerOn = false;
 }
 
-function pauseTimer() {
-  clearInterval(timerInterval);
-  pauseBtn.innerText = "Continue";
-  pauseBtn.onclick = continueTimer;
-}
 
-function continueTimer() {
-  startTime = Date.now() - (Date.now() - startTime);
-  timerInterval = setInterval(updateTimer, 100);
-  pauseBtn.innerText = "Pause";
-  pauseBtn.onclick = pauseTimer;
-}
 
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerEl.innerText = "00:00:00";
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
-  stopBtn.disabled = true;
-}
 
-startBtn.addEventListener("click", startTimer);
-pauseBtn.addEventListener("click", pauseTimer);
-stopBtn.addEventListener("click", stopTimer);
+function pause() {
+
+
+    if (timerOn) {
+        clearInterval(timerId)
+        timerOn = false;
+        document.getElementById('pause').innerText = "continue"
+    }
+    else {
+        document.getElementById('pause').innerText = "pause"
+        start()
+    }
+}
